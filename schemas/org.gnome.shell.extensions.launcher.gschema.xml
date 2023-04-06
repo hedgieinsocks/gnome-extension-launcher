@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
   <schema id="org.gnome.shell.extensions.launcher" path="/org/gnome/shell/extensions/launcher/">
-    <key name="command" type="s">
-      <default>"bash example.sh"</default>
+    <key name="path" type="s">
+      <default>""</default>
     </key>
     <key name="logging" type="b">
       <default>false</default>

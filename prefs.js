@@ -18,16 +18,16 @@ function fillPreferencesWindow(window) {
     const group = new Adw.PreferencesGroup();
     page.add(group);
 
-    // Enter Command
+    // Enter Path
     const rowCom = new Adw.ActionRow({
-        title: 'Enter Command',
-        subtitle: 'Shell Expansion is not supported',
+        title: 'Enter Path',
+        subtitle: 'Directory with your scripts',
     });
     group.add(rowCom);
 
     const entry = new Gtk.Entry({
-        placeholder_text: 'bash example.sh',
-        text: settings.get_string('command'),
+        placeholder_text: '/home/username/myscripts',
+        text: settings.get_string('path'),
         valign: Gtk.Align.CENTER,
         hexpand: true,
     });
@@ -36,7 +36,7 @@ function fillPreferencesWindow(window) {
     rowCom.activatable_widget = entry;
 
     settings.bind(
-        'command',
+        'path',
         entry,
         'text',
         Gio.SettingsBindFlags.DEFAULT
