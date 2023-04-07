@@ -19,11 +19,11 @@ function fillPreferencesWindow(window) {
     page.add(group);
 
     // Enter Path
-    const rowCom = new Adw.ActionRow({
+    const rowPath = new Adw.ActionRow({
         title: 'Enter Path',
         subtitle: 'Directory with your scripts',
     });
-    group.add(rowCom);
+    group.add(rowPath);
 
     const entry = new Gtk.Entry({
         placeholder_text: '/home/username/myscripts',
@@ -32,8 +32,8 @@ function fillPreferencesWindow(window) {
         hexpand: true,
     });
 
-    rowCom.add_suffix(entry);
-    rowCom.activatable_widget = entry;
+    rowPath.add_suffix(entry);
+    rowPath.activatable_widget = entry;
 
     settings.bind(
         'path',

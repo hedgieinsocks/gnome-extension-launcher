@@ -13,6 +13,17 @@ const Me = ExtensionUtils.getCurrentExtension();
 const ICON = 'utilities-terminal-symbolic';
 
 
+const ScrollableMenu = class ScrollableMenu extends PopupMenu.PopupMenuSection {
+    constructor() {
+        super();
+        let scrollView = new St.ScrollView();
+        this.innerMenu = new PopupMenu.PopupMenuSection();
+        scrollView.add_actor(this.innerMenu.actor);
+        this.actor.add_actor(scrollView);
+    }
+};
+
+
 class Extension {
     constructor() {
         this._indicator = null;
@@ -39,7 +50,7 @@ class Extension {
 
 
     _fillMenu() {
-        this._menu.removeAll();
+        this._menu.innerMenu.removeAll();
 
         this._path = this._settings.get_string('path');
         if (!this._path) {
@@ -47,15 +58,10 @@ class Extension {
         }
 
         this._getScripts(this._path).forEach(script => {
-            this._menu.addAction(script.get_name(),
+            this._menu.innerMenu.addAction(script.get_name(),
                 () => this._launchScript(script.get_name()),
                 script.get_icon());
         });
-
-
-        if (!this._menu.isEmpty()) {
-            this._menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        }
     }
 
 
@@ -81,11 +87,13 @@ class Extension {
         }
 
         enumerator.close(null);
+        scripts.sort((a, b) => a.get_name().localeCompare(b.get_name()));
         return scripts;
     }
 
 
     _launchScript(script) {
+        this._indicator.menu.toggle();
         let command = [`${this._path}/${script}`];
 
         try {
@@ -118,7 +126,7 @@ class Extension {
         });
         this._indicator.add_child(icon);
 
-        this._menu = new PopupMenu.PopupMenuSection();
+        this._menu = new ScrollableMenu();
         this._indicator.menu.addMenuItem(this._menu);
 
         this._indicator.menu.addAction('Settings',
