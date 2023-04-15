@@ -27,7 +27,7 @@ const ScrollableMenu = class ScrollableMenu extends PopupMenu.PopupMenuSection {
 class Extension {
     constructor() {
         this._indicator = null;
-        this._indicatorId = null;
+        this._menuId = null;
         this._settings = null;
         this._launcher = null;
         this._menu = null;
@@ -135,7 +135,11 @@ class Extension {
 
         Main.panel.addToStatusArea(Me.metadata.name, this._indicator);
 
-        this._indicatorId = this._indicator.connect('button-press-event', this._fillMenu.bind(this));
+        this._menuId = this._indicator.menu.connect('open-state-changed', open => {
+            if (open) {
+                this._fillMenu();
+            }
+        });
     }
 
 
@@ -150,10 +154,10 @@ class Extension {
 
 
     disable() {
-        this._indicator.disconnect(this._indicatorId);
+        this._indicator.menu.disconnect(this._menuId);
         this._indicator.destroy();
         this._indicator = null;
-        this._indicatorId = null;
+        this._menuId = null;
         this._menu = null;
         this._settings = null;
         this._launcher = null;
