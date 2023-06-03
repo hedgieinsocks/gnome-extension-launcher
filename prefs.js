@@ -86,5 +86,34 @@ function fillPreferencesWindow(window) {
     rowNotify.add_suffix(toggleNotify);
     rowNotify.activatable_widget = toggleNotify;
 
+    // Output
+    const rowOutput = new Adw.ActionRow({
+        title: 'Show Output',
+        subtitle: 'Show a notification with output of command execution if notify is enabled',
+    });
+    group.add(rowOutput);
+
+    const toggleOutput = new Gtk.Switch({
+        active: settings.get_boolean('output'),
+        valign: Gtk.Align.CENTER,
+    });
+
+    settings.bind(
+        'output',
+        toggleOutput,
+        'active',
+        Gio.SettingsBindFlags.DEFAULT
+    );
+
+    settings.bind(
+        'notify',
+        toggleOutput,
+        'sensitive',
+        Gio.SettingsBindFlags.DEFAULT
+    );
+
+    rowOutput.add_suffix(toggleOutput);
+    rowOutput.activatable_widget = toggleOutput;
+
     window.add(page);
 }
