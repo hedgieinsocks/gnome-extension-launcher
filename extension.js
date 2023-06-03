@@ -105,7 +105,7 @@ class Extension {
                 let output = this._settings.get_boolean('output');
                 if (notify) {
                     if (output) {
-                        Main.notify(Me.metadata.name, `${stdout || stderr}`);
+                        Main.notify(Me.metadata.name, `${script}: ${stdout || stderr}`);
                     } else {
                         Main.notify(Me.metadata.name, `${script}: completed with exit code: ${proc.get_exit_status()}`);
                     }
