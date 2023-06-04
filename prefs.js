@@ -6,6 +6,7 @@ const {Adw, Gio, GLib, Gtk} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
+const notifyModes = ['disabled', 'exit code', 'script output'];
 
 function init() {
 }
@@ -42,20 +43,20 @@ function fillPreferencesWindow(window) {
         Gio.SettingsBindFlags.DEFAULT
     );
 
-    // Enable Logs
+    // Log
     const rowLog = new Adw.ActionRow({
-        title: 'Enable Log',
+        title: 'Log',
         subtitle: `${GLib.get_home_dir()}/.${Me.metadata.name}.log`,
     });
     group.add(rowLog);
 
     const toggleLog = new Gtk.Switch({
-        active: settings.get_boolean('logging'),
+        active: settings.get_boolean('log'),
         valign: Gtk.Align.CENTER,
     });
 
     settings.bind(
-        'logging',
+        'log',
         toggleLog,
         'active',
         Gio.SettingsBindFlags.DEFAULT
@@ -67,53 +68,25 @@ function fillPreferencesWindow(window) {
     // Notify
     const rowNotify = new Adw.ActionRow({
         title: 'Notify',
-        subtitle: 'Show a notification on command completion',
+        subtitle: 'Show a notification on script completion',
     });
     group.add(rowNotify);
 
-    const toggleNotify = new Gtk.Switch({
-        active: settings.get_boolean('notify'),
+    const dropdownNotify = new Gtk.DropDown({
         valign: Gtk.Align.CENTER,
+        model: Gtk.StringList.new(notifyModes),
+        selected: settings.get_int('notify'),
     });
 
     settings.bind(
         'notify',
-        toggleNotify,
-        'active',
+        dropdownNotify,
+        'selected',
         Gio.SettingsBindFlags.DEFAULT
     );
 
-    rowNotify.add_suffix(toggleNotify);
-    rowNotify.activatable_widget = toggleNotify;
-
-    // Output
-    const rowOutput = new Adw.ActionRow({
-        title: 'Show Output',
-        subtitle: 'Show a notification with output of command execution if notify is enabled',
-    });
-    group.add(rowOutput);
-
-    const toggleOutput = new Gtk.Switch({
-        active: settings.get_boolean('output'),
-        valign: Gtk.Align.CENTER,
-    });
-
-    settings.bind(
-        'output',
-        toggleOutput,
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    settings.bind(
-        'notify',
-        toggleOutput,
-        'sensitive',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    rowOutput.add_suffix(toggleOutput);
-    rowOutput.activatable_widget = toggleOutput;
+    rowNotify.add_suffix(dropdownNotify);
+    rowNotify.activatable_widget = dropdownNotify;
 
     window.add(page);
 }

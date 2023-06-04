@@ -4,14 +4,11 @@
     <key name="path" type="s">
       <default>""</default>
     </key>
-    <key name="logging" type="b">
+    <key name="log" type="b">
       <default>false</default>
     </key>
-    <key name="notify" type="b">
-      <default>false</default>
-    </key>
-    <key name="output" type="b">
-      <default>false</default>
+    <key name="notify" type="i">
+      <default>1</default>
     </key>
   </schema>
 </schemalist>
