@@ -102,8 +102,13 @@ class Extension {
                 let [, stdout, stderr] = proc.communicate_utf8_finish(res);
 
                 let notify = this._settings.get_boolean('notify');
+                let output = this._settings.get_boolean('output');
                 if (notify) {
-                    Main.notify(Me.metadata.name, `${script}: completed with exit code: ${proc.get_exit_status()}`);
+                    if (output) {
+                        Main.notify(Me.metadata.name, `${script}: ${stdout || stderr}`);
+                    } else {
+                        Main.notify(Me.metadata.name, `${script}: completed with exit code: ${proc.get_exit_status()}`);
+                    }
                 }
 
                 let logging = this._settings.get_boolean('logging');

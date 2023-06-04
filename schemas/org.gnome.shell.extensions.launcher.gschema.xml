@@ -10,5 +10,8 @@
     <key name="notify" type="b">
       <default>false</default>
     </key>
+    <key name="output" type="b">
+      <default>false</default>
+    </key>
   </schema>
 </schemalist>
