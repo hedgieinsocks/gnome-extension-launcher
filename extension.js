@@ -108,7 +108,7 @@ class Extension {
                     Main.notify(Me.metadata.name, `[${script}]: ${stdout || stderr}`);
                 }
 
-                let logging = this._settings.get_boolean('logging');
+                let logging = this._settings.get_boolean('log');
                 if (logging) {
                     this._appendLog(script, stdout, stderr);
                 }
