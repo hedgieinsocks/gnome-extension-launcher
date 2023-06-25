@@ -101,11 +101,13 @@ class Extension {
             proc.communicate_utf8_async(null, null, (proc, res) => {
                 let [, stdout, stderr] = proc.communicate_utf8_finish(res);
 
-                let notify = this._settings.get_int('notify');
-                if (notify === 1) {
-                    Main.notify(Me.metadata.name, `[${script}]: completed with exit code: ${proc.get_exit_status()}`);
-                } else if (notify === 2) {
-                    Main.notify(Me.metadata.name, `[${script}]: ${stdout || stderr}`);
+                let notify = this._settings.get_boolean('notify');
+                if (notify) {
+                    if (stdout || stderr) {
+                        Main.notify(Me.metadata.name, `[${script}]: ${stdout || stderr}`);
+                    } else {
+                        Main.notify(Me.metadata.name, `[${script}]: completed with exit code: ${proc.get_exit_status()}`);
+                    }
                 }
 
                 let logging = this._settings.get_boolean('log');

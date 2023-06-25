@@ -6,7 +6,6 @@ const {Adw, Gio, GLib, Gtk} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
-const notifyModes = ['disabled', 'exit code', 'script output'];
 
 function init() {
 }
@@ -68,25 +67,24 @@ function fillPreferencesWindow(window) {
     // Notify
     const rowNotify = new Adw.ActionRow({
         title: 'Notify',
-        subtitle: 'Show a notification on script completion',
+        subtitle: 'Show a notification (stdout || stderr || exit code) on script completion',
     });
     group.add(rowNotify);
 
-    const dropdownNotify = new Gtk.DropDown({
+    const toggleNotify = new Gtk.Switch({
+        active: settings.get_boolean('notify'),
         valign: Gtk.Align.CENTER,
-        model: Gtk.StringList.new(notifyModes),
-        selected: settings.get_int('notify'),
     });
 
     settings.bind(
         'notify',
-        dropdownNotify,
-        'selected',
+        toggleLog,
+        'active',
         Gio.SettingsBindFlags.DEFAULT
     );
 
-    rowNotify.add_suffix(dropdownNotify);
-    rowNotify.activatable_widget = dropdownNotify;
+    rowNotify.add_suffix(toggleNotify);
+    rowNotify.activatable_widget = toggleNotify;
 
     window.add(page);
 }
