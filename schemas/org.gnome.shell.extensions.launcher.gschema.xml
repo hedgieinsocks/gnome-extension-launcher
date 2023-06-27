@@ -10,5 +10,11 @@
     <key name="notify" type="b">
       <default>true</default>
     </key>
+    <key name="shebang-icon" type="b">
+      <default>true</default>
+    </key>
+    <key name="default-icon" type="s">
+      <default>"pan-end-symbolic"</default>
+    </key>
   </schema>
 </schemalist>

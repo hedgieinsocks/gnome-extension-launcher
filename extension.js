@@ -11,6 +11,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 
 
 const ICON = 'utilities-terminal-symbolic';
+const BULLET = 'pan-end-symbolic';
 
 
 const ScrollableMenu = class ScrollableMenu extends PopupMenu.PopupMenuSection {
@@ -57,10 +58,13 @@ class Extension {
             return;
         }
 
+        let shebangIcon = this._settings.get_boolean('shebang-icon');
+        let dafaultIcon = this._settings.get_string('default-icon');
+
         this._getScripts(this._path).forEach(script => {
             this._menu.innerMenu.addAction(script.get_name(),
                 () => this._launchScript(script.get_name()),
-                script.get_icon());
+                (shebangIcon) ? script.get_icon() : dafaultIcon || BULLET);
         });
     }
 

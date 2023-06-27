@@ -25,19 +25,19 @@ function fillPreferencesWindow(window) {
     });
     group.add(rowPath);
 
-    const entry = new Gtk.Entry({
+    const entryPath = new Gtk.Entry({
         placeholder_text: '/home/username/myscripts',
         text: settings.get_string('path'),
         valign: Gtk.Align.CENTER,
         hexpand: true,
     });
 
-    rowPath.add_suffix(entry);
-    rowPath.activatable_widget = entry;
+    rowPath.add_suffix(entryPath);
+    rowPath.activatable_widget = entryPath;
 
     settings.bind(
         'path',
-        entry,
+        entryPath,
         'text',
         Gio.SettingsBindFlags.DEFAULT
     );
@@ -78,13 +78,59 @@ function fillPreferencesWindow(window) {
 
     settings.bind(
         'notify',
-        toggleLog,
+        toggleNotify,
         'active',
         Gio.SettingsBindFlags.DEFAULT
     );
 
     rowNotify.add_suffix(toggleNotify);
     rowNotify.activatable_widget = toggleNotify;
+
+    // Shebang Icon
+    const rowIconType = new Adw.ActionRow({
+        title: 'Shebang Icon',
+        subtitle: 'Use script shebang to set an icon',
+    });
+    group.add(rowIconType);
+
+    const toggleIconType = new Gtk.Switch({
+        active: settings.get_boolean('shebang-icon'),
+        valign: Gtk.Align.CENTER,
+    });
+
+    settings.bind(
+        'shebang-icon',
+        toggleIconType,
+        'active',
+        Gio.SettingsBindFlags.DEFAULT
+    );
+
+    rowIconType.add_suffix(toggleIconType);
+    rowIconType.activatable_widget = toggleIconType;
+
+    // Default Icon
+    const rowIconName = new Adw.ActionRow({
+        title: 'Default Icon',
+        subtitle: 'Used when shebang icon is disabled',
+    });
+    group.add(rowIconName);
+
+    const entryIconName = new Gtk.Entry({
+        placeholder_text: 'pan-end-symbolic',
+        text: settings.get_string('default-icon'),
+        valign: Gtk.Align.CENTER,
+        hexpand: true,
+    });
+
+    rowIconName.add_suffix(entryIconName);
+    rowIconName.activatable_widget = entryIconName;
+
+    settings.bind(
+        'default-icon',
+        entryIconName,
+        'text',
+        Gio.SettingsBindFlags.DEFAULT
+    );
 
     window.add(page);
 }
