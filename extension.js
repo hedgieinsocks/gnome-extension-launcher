@@ -1,18 +1,13 @@
-'use strict';
+import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
+import * as PanelMenu from "resource:///org/gnome/shell/ui/panelMenu.js";
+import * as PopupMenu from "resource:///org/gnome/shell/ui/popupMenu.js";
+import Gio from "gi://Gio";
+import GLib from "gi://GLib";
+import St from "gi://St";
 
-
-const {GLib, St, Gio} = imports.gi;
-const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
-const PopupMenu = imports.ui.popupMenu;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-
-const ICON = 'utilities-terminal-symbolic';
-const BULLET = 'pan-end-symbolic';
-
+const ICON = "utilities-terminal-symbolic";
+const BULLET = "pan-end-symbolic";
 
 const ScrollableMenu = class ScrollableMenu extends PopupMenu.PopupMenuSection {
     constructor() {
@@ -24,9 +19,9 @@ const ScrollableMenu = class ScrollableMenu extends PopupMenu.PopupMenuSection {
     }
 };
 
-
-class Extension {
-    constructor() {
+export default class LauncherExtension extends Extension {
+    constructor(metadata) {
+        super(metadata);
         this._indicator = null;
         this._menuId = null;
         this._settings = null;
@@ -35,9 +30,8 @@ class Extension {
         this._path = null;
     }
 
-
     _appendLog(script, stdout, stderr) {
-        let logName = `${GLib.get_home_dir()}/.${Me.metadata.name}.log`;
+        let logName = `${GLib.get_home_dir()}/.${this.metadata.name}.log`;
         let logFile = Gio.File.new_for_path(logName);
         let encoder = new TextEncoder();
         let date = new Date();
@@ -49,25 +43,25 @@ class Extension {
         outputStream.close(null);
     }
 
-
     _fillMenu() {
         this._menu.innerMenu.removeAll();
 
-        this._path = this._settings.get_string('path');
+        this._path = this._settings.get_string("path");
         if (!this._path) {
             return;
         }
 
-        let shebangIcon = this._settings.get_boolean('shebang-icon');
-        let dafaultIcon = this._settings.get_string('default-icon');
+        let shebangIcon = this._settings.get_boolean("shebang-icon");
+        let dafaultIcon = this._settings.get_string("default-icon");
 
-        this._getScripts(this._path).forEach(script => {
-            this._menu.innerMenu.addAction(script.get_name(),
+        this._getScripts(this._path).forEach((script) => {
+            this._menu.innerMenu.addAction(
+                script.get_name(),
                 () => this._launchScript(script.get_name()),
-                (shebangIcon) ? script.get_icon() : dafaultIcon || BULLET);
+                shebangIcon ? script.get_icon() : dafaultIcon || BULLET
+            );
         });
     }
-
 
     _getScripts(path) {
         let directory = Gio.File.new_for_path(path);
@@ -75,7 +69,11 @@ class Extension {
             return;
         }
 
-        let enumerator = directory.enumerate_children('standard::name,standard::type,standard::icon', Gio.FileQueryInfoFlags.NONE, null);
+        let enumerator = directory.enumerate_children(
+            "standard::name,standard::type,standard::icon",
+            Gio.FileQueryInfoFlags.NONE,
+            null
+        );
         let scripts = [];
 
         while (true) {
@@ -95,7 +93,6 @@ class Extension {
         return scripts;
     }
 
-
     _launchScript(script) {
         this._indicator.menu.toggle();
         let command = [`${this._path}/${script}`];
@@ -105,61 +102,55 @@ class Extension {
             proc.communicate_utf8_async(null, null, (proc, res) => {
                 let [, stdout, stderr] = proc.communicate_utf8_finish(res);
 
-                let notify = this._settings.get_boolean('notify');
+                let notify = this._settings.get_boolean("notify");
                 if (notify) {
                     if (stdout || stderr) {
-                        Main.notify(Me.metadata.name, `[${script}]: ${stdout || stderr}`);
+                        Main.notify(this.metadata.name, `[${script}]: ${stdout || stderr}`);
                     } else {
-                        Main.notify(Me.metadata.name, `[${script}]: completed with exit code: ${proc.get_exit_status()}`);
+                        Main.notify(this.metadata.name, `[${script}]: completed with exit code: ${proc.get_exit_status()}`);
                     }
                 }
 
-                let logging = this._settings.get_boolean('log');
+                let logging = this._settings.get_boolean("log");
                 if (logging) {
                     this._appendLog(script, stdout, stderr);
                 }
             });
         } catch (e) {
-            Main.notify(Me.metadata.name, `[${script}]: ${e.toString().replace('GLib.SpawnError: ', '')}`);
+            Main.notify(this.metadata.name, `[${script}]: ${e.toString().replace("GLib.SpawnError: ", "")}`);
         }
     }
 
-
     _addIndicator() {
-        this._indicator = new PanelMenu.Button(0.0, Me.metadata.name, false);
+        this._indicator = new PanelMenu.Button(0.0, this.metadata.name, false);
 
         let icon = new St.Icon({
-            gicon: new Gio.ThemedIcon({name: ICON}),
-            style_class: 'popup-menu-icon',
+            gicon: new Gio.ThemedIcon({ name: ICON }),
+            style_class: "popup-menu-icon",
         });
         this._indicator.add_child(icon);
 
         this._menu = new ScrollableMenu();
         this._indicator.menu.addMenuItem(this._menu);
 
-        this._indicator.menu.addAction('Settings',
-            () => ExtensionUtils.openPrefs(),
-            'preferences-system-symbolic');
+        this._indicator.menu.addAction("Settings", () => this.openPreferences(), "preferences-system-symbolic");
 
-        Main.panel.addToStatusArea(Me.metadata.name, this._indicator);
+        Main.panel.addToStatusArea(this.metadata.name, this._indicator);
 
-        this._menuId = this._indicator.menu.connect('open-state-changed', open => {
+        this._menuId = this._indicator.menu.connect("open-state-changed", (open) => {
             if (open) {
                 this._fillMenu();
             }
         });
     }
 
-
     enable() {
         this._addIndicator();
-        this._settings = ExtensionUtils.getSettings();
+        this._settings = this.getSettings();
         this._launcher = new Gio.SubprocessLauncher({
-            flags: Gio.SubprocessFlags.STDOUT_PIPE |
-                    Gio.SubprocessFlags.STDERR_PIPE,
+            flags: Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE,
         });
     }
-
 
     disable() {
         this._indicator.menu.disconnect(this._menuId);
@@ -170,9 +161,4 @@ class Extension {
         this._settings = null;
         this._launcher = null;
     }
-}
-
-
-function init() {
-    return new Extension();
 }

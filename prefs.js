@@ -1,136 +1,106 @@
-'use strict';
+import Adw from "gi://Adw";
+import Gio from "gi://Gio";
+import GLib from "gi://GLib";
+import Gtk from "gi://Gtk";
+import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";
 
+export default class LauncherPreferences extends ExtensionPreferences {
+    fillPreferencesWindow(window) {
+        const settings = this.getSettings();
 
-const {Adw, Gio, GLib, Gtk} = imports.gi;
+        const page = new Adw.PreferencesPage();
+        const group = new Adw.PreferencesGroup();
+        page.add(group);
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+        // Enter Path
+        const rowPath = new Adw.ActionRow({
+            title: "Enter Path",
+            subtitle: "Directory with your scripts",
+        });
+        group.add(rowPath);
 
+        const entryPath = new Gtk.Entry({
+            placeholder_text: "/home/username/myscripts",
+            text: settings.get_string("path"),
+            valign: Gtk.Align.CENTER,
+            hexpand: true,
+        });
 
-function init() {
-}
+        rowPath.add_suffix(entryPath);
+        rowPath.activatable_widget = entryPath;
 
+        settings.bind("path", entryPath, "text", Gio.SettingsBindFlags.DEFAULT);
 
-function fillPreferencesWindow(window) {
-    const settings = ExtensionUtils.getSettings();
+        // Log
+        const rowLog = new Adw.ActionRow({
+            title: "Log",
+            subtitle: `${GLib.get_home_dir()}/.${this.metadata.name}.log`,
+        });
+        group.add(rowLog);
 
-    const page = new Adw.PreferencesPage();
-    const group = new Adw.PreferencesGroup();
-    page.add(group);
+        const toggleLog = new Gtk.Switch({
+            active: settings.get_boolean("log"),
+            valign: Gtk.Align.CENTER,
+        });
 
-    // Enter Path
-    const rowPath = new Adw.ActionRow({
-        title: 'Enter Path',
-        subtitle: 'Directory with your scripts',
-    });
-    group.add(rowPath);
+        settings.bind("log", toggleLog, "active", Gio.SettingsBindFlags.DEFAULT);
 
-    const entryPath = new Gtk.Entry({
-        placeholder_text: '/home/username/myscripts',
-        text: settings.get_string('path'),
-        valign: Gtk.Align.CENTER,
-        hexpand: true,
-    });
+        rowLog.add_suffix(toggleLog);
+        rowLog.activatable_widget = toggleLog;
 
-    rowPath.add_suffix(entryPath);
-    rowPath.activatable_widget = entryPath;
+        // Notify
+        const rowNotify = new Adw.ActionRow({
+            title: "Notify",
+            subtitle: "Show a notification (stdout || stderr || exit code) on script completion",
+        });
+        group.add(rowNotify);
 
-    settings.bind(
-        'path',
-        entryPath,
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
+        const toggleNotify = new Gtk.Switch({
+            active: settings.get_boolean("notify"),
+            valign: Gtk.Align.CENTER,
+        });
 
-    // Log
-    const rowLog = new Adw.ActionRow({
-        title: 'Log',
-        subtitle: `${GLib.get_home_dir()}/.${Me.metadata.name}.log`,
-    });
-    group.add(rowLog);
+        settings.bind("notify", toggleNotify, "active", Gio.SettingsBindFlags.DEFAULT);
 
-    const toggleLog = new Gtk.Switch({
-        active: settings.get_boolean('log'),
-        valign: Gtk.Align.CENTER,
-    });
+        rowNotify.add_suffix(toggleNotify);
+        rowNotify.activatable_widget = toggleNotify;
 
-    settings.bind(
-        'log',
-        toggleLog,
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
+        // Shebang Icon
+        const rowIconType = new Adw.ActionRow({
+            title: "Shebang Icon",
+            subtitle: "Use script shebang to set an icon",
+        });
+        group.add(rowIconType);
 
-    rowLog.add_suffix(toggleLog);
-    rowLog.activatable_widget = toggleLog;
+        const toggleIconType = new Gtk.Switch({
+            active: settings.get_boolean("shebang-icon"),
+            valign: Gtk.Align.CENTER,
+        });
 
-    // Notify
-    const rowNotify = new Adw.ActionRow({
-        title: 'Notify',
-        subtitle: 'Show a notification (stdout || stderr || exit code) on script completion',
-    });
-    group.add(rowNotify);
+        settings.bind("shebang-icon", toggleIconType, "active", Gio.SettingsBindFlags.DEFAULT);
 
-    const toggleNotify = new Gtk.Switch({
-        active: settings.get_boolean('notify'),
-        valign: Gtk.Align.CENTER,
-    });
+        rowIconType.add_suffix(toggleIconType);
+        rowIconType.activatable_widget = toggleIconType;
 
-    settings.bind(
-        'notify',
-        toggleNotify,
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
+        // Default Icon
+        const rowIconName = new Adw.ActionRow({
+            title: "Default Icon",
+            subtitle: "Used when shebang icon is disabled",
+        });
+        group.add(rowIconName);
 
-    rowNotify.add_suffix(toggleNotify);
-    rowNotify.activatable_widget = toggleNotify;
+        const entryIconName = new Gtk.Entry({
+            placeholder_text: "pan-end-symbolic",
+            text: settings.get_string("default-icon"),
+            valign: Gtk.Align.CENTER,
+            hexpand: true,
+        });
 
-    // Shebang Icon
-    const rowIconType = new Adw.ActionRow({
-        title: 'Shebang Icon',
-        subtitle: 'Use script shebang to set an icon',
-    });
-    group.add(rowIconType);
+        rowIconName.add_suffix(entryIconName);
+        rowIconName.activatable_widget = entryIconName;
 
-    const toggleIconType = new Gtk.Switch({
-        active: settings.get_boolean('shebang-icon'),
-        valign: Gtk.Align.CENTER,
-    });
+        settings.bind("default-icon", entryIconName, "text", Gio.SettingsBindFlags.DEFAULT);
 
-    settings.bind(
-        'shebang-icon',
-        toggleIconType,
-        'active',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    rowIconType.add_suffix(toggleIconType);
-    rowIconType.activatable_widget = toggleIconType;
-
-    // Default Icon
-    const rowIconName = new Adw.ActionRow({
-        title: 'Default Icon',
-        subtitle: 'Used when shebang icon is disabled',
-    });
-    group.add(rowIconName);
-
-    const entryIconName = new Gtk.Entry({
-        placeholder_text: 'pan-end-symbolic',
-        text: settings.get_string('default-icon'),
-        valign: Gtk.Align.CENTER,
-        hexpand: true,
-    });
-
-    rowIconName.add_suffix(entryIconName);
-    rowIconName.activatable_widget = entryIconName;
-
-    settings.bind(
-        'default-icon',
-        entryIconName,
-        'text',
-        Gio.SettingsBindFlags.DEFAULT
-    );
-
-    window.add(page);
+        window.add(page);
+    }
 }
