@@ -12,7 +12,7 @@ const BULLET = "pan-end-symbolic";
 const ScrollableMenu = class ScrollableMenu extends PopupMenu.PopupMenuSection {
     constructor() {
         super();
-        let scrollView = new St.ScrollView();
+        const scrollView = new St.ScrollView();
         this.innerMenu = new PopupMenu.PopupMenuSection();
         scrollView.add_actor(this.innerMenu.actor);
         this.actor.add_actor(scrollView);
@@ -31,12 +31,12 @@ export default class LauncherExtension extends Extension {
     }
 
     _appendLog(script, stdout, stderr) {
-        let logName = `${GLib.get_home_dir()}/.${this.metadata.name}.log`;
-        let logFile = Gio.File.new_for_path(logName);
-        let encoder = new TextEncoder();
-        let date = new Date();
+        const logName = `${GLib.get_home_dir()}/.${this.metadata.name}.log`;
+        const logFile = Gio.File.new_for_path(logName);
+        const encoder = new TextEncoder();
+        const date = new Date();
 
-        let outputStream = logFile.append_to(Gio.FileCreateFlags.NONE, null);
+        const outputStream = logFile.append_to(Gio.FileCreateFlags.NONE, null);
         outputStream.write(encoder.encode(`\n[${script}]: ${date}\n`), null);
         outputStream.write(encoder.encode(`STDOUT:\n${stdout}`), null);
         outputStream.write(encoder.encode(`STDERR:\n${stderr}`), null);
@@ -51,8 +51,8 @@ export default class LauncherExtension extends Extension {
             return;
         }
 
-        let shebangIcon = this._settings.get_boolean("shebang-icon");
-        let dafaultIcon = this._settings.get_string("default-icon");
+        const shebangIcon = this._settings.get_boolean("shebang-icon");
+        const dafaultIcon = this._settings.get_string("default-icon");
 
         this._getScripts(this._path).forEach((script) => {
             this._menu.innerMenu.addAction(
@@ -64,25 +64,25 @@ export default class LauncherExtension extends Extension {
     }
 
     _getScripts(path) {
-        let directory = Gio.File.new_for_path(path);
+        const directory = Gio.File.new_for_path(path);
         if (!directory.query_exists(null)) {
             return;
         }
 
-        let enumerator = directory.enumerate_children(
+        const enumerator = directory.enumerate_children(
             "standard::name,standard::type,standard::icon",
             Gio.FileQueryInfoFlags.NONE,
             null
         );
-        let scripts = [];
+        const scripts = [];
 
         while (true) {
-            let fileInfo = enumerator.next_file(null);
+            const fileInfo = enumerator.next_file(null);
             if (!fileInfo) {
                 break;
             }
 
-            let fileType = fileInfo.get_file_type();
+            const fileType = fileInfo.get_file_type();
             if (fileType === Gio.FileType.REGULAR) {
                 scripts.push(fileInfo);
             }
@@ -95,14 +95,14 @@ export default class LauncherExtension extends Extension {
 
     _launchScript(script) {
         this._indicator.menu.toggle();
-        let command = [`${this._path}/${script}`];
+        const command = [`${this._path}/${script}`];
 
         try {
-            let proc = this._launcher.spawnv(command);
+            const proc = this._launcher.spawnv(command);
             proc.communicate_utf8_async(null, null, (proc, res) => {
-                let [, stdout, stderr] = proc.communicate_utf8_finish(res);
+                const [, stdout, stderr] = proc.communicate_utf8_finish(res);
 
-                let notify = this._settings.get_boolean("notify");
+                const notify = this._settings.get_boolean("notify");
                 if (notify) {
                     if (stdout || stderr) {
                         Main.notify(this.metadata.name, `[${script}]: ${stdout || stderr}`);
@@ -111,7 +111,7 @@ export default class LauncherExtension extends Extension {
                     }
                 }
 
-                let logging = this._settings.get_boolean("log");
+                const logging = this._settings.get_boolean("log");
                 if (logging) {
                     this._appendLog(script, stdout, stderr);
                 }
@@ -124,7 +124,7 @@ export default class LauncherExtension extends Extension {
     _addIndicator() {
         this._indicator = new PanelMenu.Button(0.0, this.metadata.name, false);
 
-        let icon = new St.Icon({
+        const icon = new St.Icon({
             gicon: new Gio.ThemedIcon({ name: ICON }),
             style_class: "popup-menu-icon",
         });
@@ -132,7 +132,6 @@ export default class LauncherExtension extends Extension {
 
         this._menu = new ScrollableMenu();
         this._indicator.menu.addMenuItem(this._menu);
-
         this._indicator.menu.addAction("Settings", () => this.openPreferences(), "preferences-system-symbolic");
 
         Main.panel.addToStatusArea(this.metadata.name, this._indicator);
