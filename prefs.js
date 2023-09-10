@@ -26,10 +26,10 @@ export default class LauncherPreferences extends ExtensionPreferences {
             hexpand: true,
         });
 
+        settings.bind("path", entryPath, "text", Gio.SettingsBindFlags.DEFAULT);
+
         rowPath.add_suffix(entryPath);
         rowPath.activatable_widget = entryPath;
-
-        settings.bind("path", entryPath, "text", Gio.SettingsBindFlags.DEFAULT);
 
         // Log
         const rowLog = new Adw.ActionRow({
@@ -96,10 +96,10 @@ export default class LauncherPreferences extends ExtensionPreferences {
             hexpand: true,
         });
 
+        settings.bind("default-icon", entryIconName, "text", Gio.SettingsBindFlags.DEFAULT);
+
         rowIconName.add_suffix(entryIconName);
         rowIconName.activatable_widget = entryIconName;
-
-        settings.bind("default-icon", entryIconName, "text", Gio.SettingsBindFlags.DEFAULT);
 
         window.add(page);
     }
