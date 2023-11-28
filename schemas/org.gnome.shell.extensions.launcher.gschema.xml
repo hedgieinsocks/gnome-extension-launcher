@@ -16,5 +16,8 @@
     <key name="default-icon" type="s">
       <default>"pan-end-symbolic"</default>
     </key>
+    <key name="strip" type="b">
+      <default>true</default>
+    </key>
   </schema>
 </schemalist>

@@ -101,6 +101,23 @@ export default class LauncherPreferences extends ExtensionPreferences {
         rowIconName.add_suffix(entryIconName);
         rowIconName.activatable_widget = entryIconName;
 
+        // Strip
+        const rowStrip = new Adw.ActionRow({
+            title: "Strip",
+            subtitle: "Hide file extensions",
+        });
+        group.add(rowStrip);
+
+        const toggleStrip = new Gtk.Switch({
+            active: settings.get_boolean("strip"),
+            valign: Gtk.Align.CENTER,
+        });
+
+        settings.bind("strip", toggleStrip, "active", Gio.SettingsBindFlags.DEFAULT);
+
+        rowStrip.add_suffix(toggleStrip);
+        rowStrip.activatable_widget = toggleStrip;
+
         window.add(page);
     }
 }

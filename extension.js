@@ -53,10 +53,11 @@ export default class LauncherExtension extends Extension {
 
         const shebangIcon = this._settings.get_boolean("shebang-icon");
         const dafaultIcon = this._settings.get_string("default-icon");
+        const stripExt = this._settings.get_boolean("strip");
 
         this._getScripts(this._path).forEach((script) => {
             this._menu.innerMenu.addAction(
-                script.get_name(),
+                stripExt ? script.get_name().replace(/\.[^\.]+$/, "") : script.get_name(),
                 () => this._launchScript(script.get_name()),
                 shebangIcon ? script.get_icon() : dafaultIcon || BULLET
             );
