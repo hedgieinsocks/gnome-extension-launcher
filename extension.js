@@ -123,7 +123,7 @@ export default class LauncherExtension extends Extension {
     }
 
     _addIndicator() {
-        this._indicator = new PanelMenu.Button(0.0, this.metadata.name, false);
+        this._indicator = new PanelMenu.Button(0.5, this.metadata.name, false);
 
         const icon = new St.Icon({
             gicon: new Gio.ThemedIcon({ name: ICON }),
