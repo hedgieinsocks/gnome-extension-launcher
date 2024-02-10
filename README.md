@@ -1,5 +1,5 @@
-# 🚀 Launcher - GNOME extension
+# Launcher
 
-## Run a script from a Panel Indicator
+## Run scripts from a panel indicator
 
 https://extensions.gnome.org/extension/5874/launcher/

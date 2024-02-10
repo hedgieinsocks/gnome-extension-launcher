@@ -1,8 +1,8 @@
 {
     "uuid": "launcher@hedgie.tech",
     "name": "Launcher",
-    "description": "Launch scripts from a Panel Indicator",
+    "description": "Launch scripts from a panel indicator",
     "shell-version": ["45"],
     "settings-schema": "org.gnome.shell.extensions.launcher",
-    "url": "https://github.com/hedgieinsocks/launcher"
+    "url": "https://github.com/hedgieinsocks/gnome-extension-launcher"
 }
