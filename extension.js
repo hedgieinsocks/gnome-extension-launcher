@@ -2,6 +2,7 @@ import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 import * as Main from "resource:///org/gnome/shell/ui/main.js";
 import * as PanelMenu from "resource:///org/gnome/shell/ui/panelMenu.js";
 import * as PopupMenu from "resource:///org/gnome/shell/ui/popupMenu.js";
+import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 import Gio from "gi://Gio";
 import GLib from "gi://GLib";
 import St from "gi://St";
@@ -14,8 +15,14 @@ const ScrollableMenu = class ScrollableMenu extends PopupMenu.PopupMenuSection {
         super();
         const scrollView = new St.ScrollView();
         this.innerMenu = new PopupMenu.PopupMenuSection();
-        scrollView.add_actor(this.innerMenu.actor);
-        this.actor.add_actor(scrollView);
+        const shellVersion = parseFloat(Config.PACKAGE_VERSION).toString().slice(0, 2);
+        if (shellVersion == 45) {
+            scrollView.add_actor(this.innerMenu.actor);
+            this.actor.add_actor(scrollView);
+        } else {
+            scrollView.add_child(this.innerMenu.actor);
+            this.actor.add_child(scrollView);
+        }
     }
 };
 
