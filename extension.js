@@ -2,7 +2,6 @@ import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
 import * as Main from "resource:///org/gnome/shell/ui/main.js";
 import * as PanelMenu from "resource:///org/gnome/shell/ui/panelMenu.js";
 import * as PopupMenu from "resource:///org/gnome/shell/ui/popupMenu.js";
-import * as Config from "resource:///org/gnome/shell/misc/config.js";
 import Gio from "gi://Gio";
 import GLib from "gi://GLib";
 import St from "gi://St";
@@ -15,16 +14,8 @@ const ScrollableMenu = class ScrollableMenu extends PopupMenu.PopupMenuSection {
     super();
     const scrollView = new St.ScrollView();
     this.innerMenu = new PopupMenu.PopupMenuSection();
-    const shellVersion = parseFloat(Config.PACKAGE_VERSION)
-      .toString()
-      .slice(0, 2);
-    if (shellVersion == 45) {
-      scrollView.add_actor(this.innerMenu.actor);
-      this.actor.add_actor(scrollView);
-    } else {
-      scrollView.add_child(this.innerMenu.actor);
-      this.actor.add_child(scrollView);
-    }
+    scrollView.add_child(this.innerMenu.actor);
+    this.actor.add_child(scrollView);
   }
 };
 
@@ -160,7 +151,7 @@ export default class LauncherExtension extends Extension {
 
     this._menuId = this._indicator.menu.connect(
       "open-state-changed",
-      (open) => {
+      (_, open) => {
         if (open) {
           this._fillMenu();
         }
@@ -177,12 +168,14 @@ export default class LauncherExtension extends Extension {
   }
 
   disable() {
+    this._menu.destroy();
+    this._menu = null;
     this._indicator.menu.disconnect(this._menuId);
     this._indicator.destroy();
     this._indicator = null;
     this._menuId = null;
-    this._menu = null;
     this._settings = null;
+    this._path = null;
     this._launcher = null;
   }
 }
